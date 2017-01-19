@@ -5,7 +5,6 @@ badGlobalMuonTagger = cms.EDFilter("BadGlobalMuonTagger",
     vtx   = cms.InputTag("offlinePrimaryVertices"),
     muonPtCut = cms.double(20),
     selectClones = cms.bool(False),
-    taggingMode = cms.bool(False),
 )
 cloneGlobalMuonTagger = badGlobalMuonTagger.clone(
     selectClones = True
