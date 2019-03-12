@@ -164,6 +164,7 @@ EmbeddingHepMCFilter::apply_cuts(std::vector<reco::Candidate::LorentzVector> &p4
             << " abs(eta1) = " << cut->eta1 << " abs(eta2) = " << cut->eta2
             << " decay channel: " << return_mode(cut->decaychannel.first)
             << return_mode(cut->decaychannel.second);
+
 	    if((cut->pt1 == -1. || (p4VisPair[0].Pt() > cut->pt1)) &&
 	       (cut->pt2 == -1. || (p4VisPair[1].Pt() > cut->pt2)) &&
 	       (cut->eta1 == -1.|| (std::abs(p4VisPair[0].Eta()) < cut->eta1)) &&
