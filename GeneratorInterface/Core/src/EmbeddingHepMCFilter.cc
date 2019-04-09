@@ -5,7 +5,7 @@
 
 EmbeddingHepMCFilter::EmbeddingHepMCFilter(const edm::ParameterSet & iConfig)
     : ZPDGID_(iConfig.getParameter<int>("BosonPDGID"))
-{    
+{
     // Defining standard decay channels
     ee.fill(TauDecayMode::Electron); ee.fill(TauDecayMode::Electron);
     mm.fill(TauDecayMode::Muon); mm.fill(TauDecayMode::Muon);
