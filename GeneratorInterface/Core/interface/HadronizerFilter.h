@@ -49,6 +49,7 @@
 #include "SimDataFormats/GeneratorProducts/interface/GenLumiInfoProduct.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 
+#include "TRandom3.h"
 
 namespace edm
 {
@@ -253,33 +254,33 @@ namespace edm
       
       bool forcePass = false;
       int saveOneEveryN_ = 10;
-      if(filter_ && !filter_->filter(event.get(), genEventInfo->weight()) && saveOneEveryN_>0) {
+      bool passFilter = filter_->filter(event.get(), genEventInfo->weight());
+      if(filter_ && !passFilter && saveOneEveryN_>0) {
         // force 1./saveOneEveryN_ of the events that fail the filters to pass
-        rand->SetSeed((int)(ev.id().event());
+        rand->SetSeed(ev.id().event());
         double frac = 1./((double)saveOneEveryN_);
         double randVal = rand->Uniform();
         forcePass = randVal < frac;
-        std::cout << "rand = " << randVal << std::endl;
       }
-      std::cout << forcePass << std::endl;  
-jsjsjs
+
       //if HepMCFilter was specified, test event
-      if (filter_ && (!filter_->filter(event.get(), genEventInfo->weight()) || forcePass)) continue;      
+      //std::cout << filter_ << "    " <<  passFilter << "    " <<  forcePass << std::endl;
+      if (filter_ && !(passFilter || forcePass)) continue;      
 
       if(forcePass) {
        // If the event failed the filter but was forced to pass by the random number generator the event weight is modified accordingly
        double weight = (double)saveOneEveryN_; 
-       genEventInfo->weight()[0] *= weight; 
+       genEventInfo->weights()[0] *= weight; 
        event->weights()[0] *= weight;
+       filter_->increasepass(genEventInfo->weight()); // need to call this function to increased the number of events passing the filter
       }      
 
       waccept += genEventInfo->weight();
       ++naccept;
-      
       //keep the LAST accepted event (which is equivalent to choosing randomly from the accepted events)
       finalEvent = std::move(event);
       finalGenEventInfo = std::move(genEventInfo);
-      
+
     }
     
     if (!naccept) return false;
@@ -296,9 +297,8 @@ jsjsjs
       //adjust weight for HepMC GenEvent (used e.g for RIVET)
       finalEvent->weights()[0] *= multihadweight;
   
-      std::cout << finalGenEventInfo->weights()[0] << std::endl;
     }
-    
+ 
     ev.put(std::move(finalGenEventInfo));
 
     std::unique_ptr<HepMCProduct> bare_product(new HepMCProduct());

@@ -68,6 +68,14 @@ bool HepMCFilterDriver::filter(const HepMC::GenEvent* evt, double weight)
   return accepted;
 }
 
+void HepMCFilterDriver::increasepass(double weight)
+{
+  if(weight>0) numEventsPassPos_++;
+  else numEventsPassNeg_++; 
+  sumpass_w_   += weight;
+  sumpass_w2_ += weight*weight;
+}
+
 void HepMCFilterDriver::statistics() const
 { 
 

@@ -6,7 +6,6 @@
 
 #include "GeneratorInterface/Core/interface/BaseHepMCFilter.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
-#include "TRandom3.h"
 
 class EmbeddingHepMCFilter : public BaseHepMCFilter{
     
@@ -19,9 +18,7 @@ class EmbeddingHepMCFilter : public BaseHepMCFilter{
         const int electron_neutrino_PDGID_ = 12;
         const int electronPDGID_ = 11;
         int ZPDGID_ = 23;
-        int saveOneEveryN_=-1;
 
-        TRandom3  *rand;
         
         enum class TauDecayMode : int
         {

@@ -4,8 +4,7 @@
 #include "boost/algorithm/string/trim_all.hpp"
 
 EmbeddingHepMCFilter::EmbeddingHepMCFilter(const edm::ParameterSet & iConfig)
-    : ZPDGID_(iConfig.getParameter<int>("BosonPDGID")),
-      saveOneEveryN_(iConfig.getParameter<int>("saveOneEveryN"))
+    : ZPDGID_(iConfig.getParameter<int>("BosonPDGID"))
 {
     // Defining standard decay channels
     ee.fill(TauDecayMode::Electron); ee.fill(TauDecayMode::Electron);
@@ -36,7 +35,6 @@ EmbeddingHepMCFilter::EmbeddingHepMCFilter(const edm::ParameterSet & iConfig)
       else edm::LogWarning("EmbeddingHepMCFilter") << (*final_state) << " this decay channel is not supported. Please choose on of (ElEl,MuMu,HadHad,ElMu,ElHad,MuHad)";
      }
 
-     rand = new TRandom3(0);
 }
 
 EmbeddingHepMCFilter::~EmbeddingHepMCFilter()
@@ -85,31 +83,6 @@ EmbeddingHepMCFilter::filter(const HepMC::GenEvent* evt)
     << "\tPt's: " << " 1st " << p4VisPair_[0].Pt() << ", 2nd " << p4VisPair_[1].Pt()
     << "\tEta's: " << " 1st " << p4VisPair_[0].Eta() << ", 2nd " << p4VisPair_[1].Eta()
     << " decay channel: " << return_mode(DecayChannel_.first)<< return_mode(DecayChannel_.second);
-   
-//    bool forcePass = false;
-//    if(!apply_cuts(p4VisPair_) && saveOneEveryN_>0){
-//      // force 1./saveOneEveryN_ of the events that fail the filters to be stored
-//      rand->SetSeed((int)((std::fabs(p4VisPair_[0].Eta()+5))*100000));
-//      double frac = 1./((double)saveOneEveryN_);
-//      double randVal = rand->Uniform();
-//      forcePass = randVal < frac;
-//
-//      if(forcePass) {
-//        // If the event failed the filter but was forced to pass by the random number generator the event weight is modified accordingly
-//        //double weight = (double)saveOneEveryN_;
-//
-//        //std::unique_ptr<HepMC::GenEvent> finalEvent;
-//        //std::unique_ptr<GenEventInfoProduct> finalGenEventInfo; 
-//
-//        //adjust weight for GenEventInfoProduct
-//        //finalGenEventInfo->weights()[0] *= weight;
-//        
-//        //adjust weight for HepMC GenEvent (used e.g for RIVET)
-//        //evt->weights()[0] *= weight;
-//        //std::cout << genEventInfo_->weights()[0] << std::endl;
-//        //std::cout << evt->weights()[0] << std::endl;
-//      }
-//    }
  
     return apply_cuts(p4VisPair_);
 }

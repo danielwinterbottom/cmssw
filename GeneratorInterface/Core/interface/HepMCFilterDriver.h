@@ -21,6 +21,7 @@ class HepMCFilterDriver {
     ~HepMCFilterDriver();
 
     bool filter(const HepMC::GenEvent* evt, double weight=1.);
+    void increasepass(double weight=1.);
     void statistics() const;
     void resetStatistics();
 
