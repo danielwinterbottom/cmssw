@@ -4,7 +4,8 @@
 #include "boost/algorithm/string/trim_all.hpp"
 
 EmbeddingHepMCFilter::EmbeddingHepMCFilter(const edm::ParameterSet & iConfig)
-{    
+    : ZPDGID_(iConfig.getParameter<int>("BosonPDGID"))
+{
     // Defining standard decay channels
     ee.fill(TauDecayMode::Electron); ee.fill(TauDecayMode::Electron);
     mm.fill(TauDecayMode::Muon); mm.fill(TauDecayMode::Muon);
@@ -101,7 +102,10 @@ EmbeddingHepMCFilter::decay_and_sump4Vis(HepMC::GenParticle* particle, reco::Can
         // Asuming, that there are only the two tauons from the Z-boson.
         // This is the case for the simulated Z->tautau event constructed by EmbeddingLHEProducer. 
         if (std::abs(particle->pdg_id()) == tauonPDGID_ && !decaymode_known)
-        {
+        {   
+            bool isGamma = std::abs((*daughter)->pdg_id())==22;
+            bool isTau = std::abs((*daughter)->pdg_id())==15;
+            // use these bools to protect againt taus that aren't last copy (which "decay" to a tau and a gamma)
             if (std::abs((*daughter)->pdg_id()) == muonPDGID_)
             {
                 DecayChannel_.fill(TauDecayMode::Muon);
@@ -112,7 +116,7 @@ EmbeddingHepMCFilter::decay_and_sump4Vis(HepMC::GenParticle* particle, reco::Can
                 DecayChannel_.fill(TauDecayMode::Electron);
                 decaymode_known = true;
             }
-            else if (!neutrino)
+            else if (!neutrino && !isGamma && !isTau)
             {
                 DecayChannel_.fill(TauDecayMode::Hadronic);
                 decaymode_known = true;
@@ -152,7 +156,7 @@ EmbeddingHepMCFilter::sort_by_convention(std::vector<reco::Candidate::LorentzVec
 
 bool
 EmbeddingHepMCFilter::apply_cuts(std::vector<reco::Candidate::LorentzVector> &p4VisPair)
-{     
+{   
     for (std::vector<CutsContainer>::const_iterator cut = cuts_.begin(); cut != cuts_.end(); ++cut)  
     {
         if(DecayChannel_.first == cut->decaychannel.first && DecayChannel_.second ==  cut->decaychannel.second){ // First the match to the decay channel
@@ -160,7 +164,7 @@ EmbeddingHepMCFilter::apply_cuts(std::vector<reco::Candidate::LorentzVector> &p4
             << " abs(eta1) = " << cut->eta1 << " abs(eta2) = " << cut->eta2
             << " decay channel: " << return_mode(cut->decaychannel.first)
             << return_mode(cut->decaychannel.second);
-            
+
 	    if((cut->pt1 == -1. || (p4VisPair[0].Pt() > cut->pt1)) &&
 	       (cut->pt2 == -1. || (p4VisPair[1].Pt() > cut->pt2)) &&
 	       (cut->eta1 == -1.|| (std::abs(p4VisPair[0].Eta()) < cut->eta1)) &&
