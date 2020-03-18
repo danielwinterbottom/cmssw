@@ -1,4 +1,3 @@
-
 // -*- C++ -*-
 //
 // Package:    METAlgorithms
@@ -14,6 +13,7 @@ Implementation:
 //         Created:  Thu May 30 16:39:52 CDT 2013
 //
 //
+
 
 #include "RecoMET/METAlgorithms/interface/METSignificance.h"
 #include <unordered_set>
@@ -54,7 +54,8 @@ metsig::METSignificance::getCovariance(const edm::View<reco::Jet>& jets,
 				       JME::JetResolution& resPtObj,
 				       JME::JetResolution& resPhiObj,
 				       JME::JetResolutionScaleFactor& resSFObj,
-				       bool isRealData) {
+				       bool isRealData,
+               bool isEmbeddedSample) {
 
   //pfcandidates
   const edm::View<reco::Candidate>* pfCandidates=pfCandidatesH.product();
@@ -109,20 +110,21 @@ metsig::METSignificance::getCovariance(const edm::View<reco::Jet>& jets,
 	 }
        }
        // if not, add to sumPt
-       if (cleancand)
-      {
-        // Temporary fix for the METCOV of embedded samples. In those samples, the matching of pfcandidates and leptoncandidate 
-        // does not work 100% and therefore the leptons are considered cleancand even if they should not be considered
-        // with this fix, all pfcandidates with pdgids of electrons, muons, photons are not considered for the METCOV
-        if ((*pfCandidates)[i].pt() > 10 && (std::abs((*pfCandidates)[i].pdgId()) == 11 || std::abs((*pfCandidates)[i].pdgId()) == 13 || std::abs((*pfCandidates)[i].pdgId()) == 22))
-        {
-          continue;
-        }
-        else
-        {
-        sumPt += (*pfCandidates)[i].pt();
-        }
-      }
+       if( cleancand ){
+         if (isEmbeddedSample){
+          // Temporary fix for the METCOV of embedded samples. In those samples, the matching of pfcandidates and leptoncandidate 
+          // does not work 100% and therefore the leptons are considered cleancand even if they should not be considered
+          // with this fix, all pfcandidates with pdgids of electrons, muons, photons are not considered for the METCOV
+          if ((*pfCandidates)[i].pt() > 10 && 
+          (std::abs((*pfCandidates)[i].pdgId()) == 11 || 
+          std::abs((*pfCandidates)[i].pdgId()) == 13 || 
+          std::abs((*pfCandidates)[i].pdgId()) == 22)){
+            std::cout << "removing missed particle !" << std::endl;
+            continue;
+          }
+         }
+	      sumPt += (*pfCandidates)[i].pt();
+       }
      }
    }
    

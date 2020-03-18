@@ -32,6 +32,7 @@ namespace cms
 	jetResPtType_ = iConfig.getParameter<std::string>("srcJetResPt");
 	jetResPhiType_ = iConfig.getParameter<std::string>("srcJetResPhi");
 	rhoToken_ = consumes<double>(iConfig.getParameter<edm::InputTag>("srcRho"));
+  isEmbeddedSample_ = iConfig.getParameter<bool>("isEmbeddedSample");
       }
 
     std::string alias = iConfig.exists("alias") ? iConfig.getParameter<std::string>("alias") : "";
@@ -99,7 +100,7 @@ namespace cms
 	event.getByToken(rhoToken_, rho);
 
 	//Compute the covariance matrix and fill it
-	reco::METCovMatrix cov = metSigAlgo_->getCovariance( *inputJets, leptons, candInput, *rho, resPtObj, resPhiObj, resSFObj, event.isRealData() );
+	reco::METCovMatrix cov = metSigAlgo_->getCovariance( *inputJets, leptons, candInput, *rho, resPtObj, resPhiObj, resSFObj, event.isRealData(), isEmbeddedSample_ );
 
 	return cov;
   }
