@@ -119,7 +119,6 @@ metsig::METSignificance::getCovariance(const edm::View<reco::Jet>& jets,
           (std::abs((*pfCandidates)[i].pdgId()) == 11 || 
           std::abs((*pfCandidates)[i].pdgId()) == 13 || 
           std::abs((*pfCandidates)[i].pdgId()) == 22)){
-            std::cout << "removing missed particle !" << std::endl;
             continue;
           }
          }
